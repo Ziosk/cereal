@@ -41,19 +41,19 @@ namespace cereal
 }
 
 // Override rapidjson assertions to throw exceptions by default
-#ifndef CEREAL_RAPIDJSON_ASSERT
-#define CEREAL_RAPIDJSON_ASSERT(x) if(!(x)){ \
+#ifndef RAPIDJSON_ASSERT
+#define RAPIDJSON_ASSERT(x) if(!(x)){ \
   throw ::cereal::RapidJSONException("rapidjson internal assertion failure: " #x); }
 #endif // RAPIDJSON_ASSERT
 
 // Enable support for parsing of nan, inf, -inf
-#ifndef CEREAL_RAPIDJSON_WRITE_DEFAULT_FLAGS
-#define CEREAL_RAPIDJSON_WRITE_DEFAULT_FLAGS kWriteNanAndInfFlag
+#ifndef RAPIDJSON_WRITE_DEFAULT_FLAGS
+#define RAPIDJSON_WRITE_DEFAULT_FLAGS kWriteNanAndInfFlag
 #endif
 
 // Enable support for parsing of nan, inf, -inf
-#ifndef CEREAL_RAPIDJSON_PARSE_DEFAULT_FLAGS
-#define CEREAL_RAPIDJSON_PARSE_DEFAULT_FLAGS kParseFullPrecisionFlag | kParseNanAndInfFlag
+#ifndef RAPIDJSON_PARSE_DEFAULT_FLAGS
+#define RAPIDJSON_PARSE_DEFAULT_FLAGS kParseFullPrecisionFlag | kParseNanAndInfFlag
 #endif
 
 #include "cereal/external/rapidjson/prettywriter.h"
@@ -69,8 +69,8 @@ namespace cereal
 #include <string>
 
 #if defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 7)
-CEREAL_RAPIDJSON_DIAG_PUSH
-CEREAL_RAPIDJSON_DIAG_OFF(implicit-fallthrough)
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(implicit-fallthrough)
 #endif
 
 namespace cereal
@@ -107,8 +107,8 @@ namespace cereal
   {
     enum class NodeType { StartObject, InObject, StartArray, InArray };
 
-    using WriteStream = CEREAL_RAPIDJSON_NAMESPACE::OStreamWrapper;
-    using JSONWriter = CEREAL_RAPIDJSON_NAMESPACE::PrettyWriter<WriteStream>;
+    using WriteStream = RAPIDJSON_NAMESPACE::OStreamWrapper;
+    using JSONWriter = RAPIDJSON_NAMESPACE::PrettyWriter<WriteStream>;
 
     public:
       /*! @name Common Functionality
@@ -253,7 +253,7 @@ namespace cereal
       //! Saves a double to the current node
       void saveValue(double d)              { itsWriter.Double(d);                                                       }
       //! Saves a string to the current node
-      void saveValue(std::string const & s) { itsWriter.String(s.c_str(), static_cast<CEREAL_RAPIDJSON_NAMESPACE::SizeType>( s.size() )); }
+      void saveValue(std::string const & s) { itsWriter.String(s.c_str(), static_cast<RAPIDJSON_NAMESPACE::SizeType>( s.size() )); }
       //! Saves a const char * to the current node
       void saveValue(char const * s)        { itsWriter.String(s);                                                       }
       //! Saves a nullptr to the current node
@@ -417,11 +417,11 @@ namespace cereal
   class JSONInputArchive : public InputArchive<JSONInputArchive>, public traits::TextArchive
   {
     private:
-      using ReadStream = CEREAL_RAPIDJSON_NAMESPACE::IStreamWrapper;
-      typedef CEREAL_RAPIDJSON_NAMESPACE::GenericValue<CEREAL_RAPIDJSON_NAMESPACE::UTF8<>> JSONValue;
+      using ReadStream = RAPIDJSON_NAMESPACE::IStreamWrapper;
+      typedef RAPIDJSON_NAMESPACE::GenericValue<RAPIDJSON_NAMESPACE::UTF8<>> JSONValue;
       typedef JSONValue::ConstMemberIterator MemberIterator;
       typedef JSONValue::ConstValueIterator ValueIterator;
-      typedef CEREAL_RAPIDJSON_NAMESPACE::Document::GenericValue GenericValue;
+      typedef RAPIDJSON_NAMESPACE::Document::GenericValue GenericValue;
 
     public:
       /*! @name Common Functionality
@@ -650,7 +650,7 @@ namespace cereal
       //! Loads a value from the current node - string overload
       void loadValue(std::string & val) { search(); val = itsIteratorStack.back().value().GetString(); ++itsIteratorStack.back(); }
       //! Loads a nullptr from the current node
-      void loadValue(std::nullptr_t&)   { search(); CEREAL_RAPIDJSON_ASSERT(itsIteratorStack.back().value().IsNull()); ++itsIteratorStack.back(); }
+      void loadValue(std::nullptr_t&)   { search(); RAPIDJSON_ASSERT(itsIteratorStack.back().value().IsNull()); ++itsIteratorStack.back(); }
 
       // Special cases to handle various flavors of long, which tend to conflict with
       // the int32_t or int64_t on various compiler/OS combinations.  MSVC doesn't need any of this.
@@ -730,7 +730,7 @@ namespace cereal
       const char * itsNextName;               //!< Next name set by NVP
       ReadStream itsReadStream;               //!< Rapidjson write stream
       std::vector<Iterator> itsIteratorStack; //!< 'Stack' of rapidJSON iterators
-      CEREAL_RAPIDJSON_NAMESPACE::Document itsDocument; //!< Rapidjson document
+      RAPIDJSON_NAMESPACE::Document itsDocument; //!< Rapidjson document
   };
 
   // ######################################################################
@@ -1015,7 +1015,7 @@ CEREAL_REGISTER_ARCHIVE(cereal::JSONOutputArchive)
 CEREAL_SETUP_ARCHIVE_TRAITS(cereal::JSONInputArchive, cereal::JSONOutputArchive)
 
 #if defined(__clang__) || (defined(__GNUC__) && __GNUC__ >= 7)
-CEREAL_RAPIDJSON_DIAG_POP
+RAPIDJSON_DIAG_POP
 #endif
 
 #endif // CEREAL_ARCHIVES_JSON_HPP_
