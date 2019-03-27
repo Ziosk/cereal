@@ -16,20 +16,20 @@
 // Loitsch, Florian. "Printing floating-point numbers quickly and accurately with
 // integers." ACM Sigplan Notices 45.6 (2010): 233-243.
 
-#ifndef CEREAL_RAPIDJSON_DTOA_
-#define CEREAL_RAPIDJSON_DTOA_
+#ifndef RAPIDJSON_DTOA_
+#define RAPIDJSON_DTOA_
 
 #include "itoa.h" // GetDigitsLut()
 #include "diyfp.h"
 #include "ieee754.h"
 
-CEREAL_RAPIDJSON_NAMESPACE_BEGIN
+RAPIDJSON_NAMESPACE_BEGIN
 namespace internal {
 
 #ifdef __GNUC__
-CEREAL_RAPIDJSON_DIAG_PUSH
-CEREAL_RAPIDJSON_DIAG_OFF(effc++)
-CEREAL_RAPIDJSON_DIAG_OFF(array-bounds) // some gcc versions generate wrong warnings https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59124
+RAPIDJSON_DIAG_PUSH
+RAPIDJSON_DIAG_OFF(effc++)
+RAPIDJSON_DIAG_OFF(array-bounds) // some gcc versions generate wrong warnings https://gcc.gnu.org/bugzilla/show_bug.cgi?id=59124
 #endif
 
 inline void GrisuRound(char* buffer, int len, uint64_t delta, uint64_t rest, uint64_t ten_kappa, uint64_t wp_w) {
@@ -41,7 +41,7 @@ inline void GrisuRound(char* buffer, int len, uint64_t delta, uint64_t rest, uin
     }
 }
 
-inline unsigned CountDecimalDigit32(uint32_t n) {
+inline int CountDecimalDigit32(uint32_t n) {
     // Simple pure C++ implementation was faster than __builtin_clz version in this situation.
     if (n < 10) return 1;
     if (n < 100) return 2;
@@ -63,7 +63,7 @@ inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buff
     const DiyFp wp_w = Mp - W;
     uint32_t p1 = static_cast<uint32_t>(Mp.f >> -one.e);
     uint64_t p2 = Mp.f & (one.f - 1);
-    unsigned kappa = CountDecimalDigit32(p1); // kappa in [0, 9]
+    int kappa = CountDecimalDigit32(p1); // kappa in [0, 9]
     *len = 0;
 
     while (kappa > 0) {
@@ -102,8 +102,8 @@ inline void DigitGen(const DiyFp& W, const DiyFp& Mp, uint64_t delta, char* buff
         kappa--;
         if (p2 < delta) {
             *K += kappa;
-            int index = -static_cast<int>(kappa);
-            GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * (index < 9 ? kPow10[-static_cast<int>(kappa)] : 0));
+            int index = -kappa;
+            GrisuRound(buffer, *len, delta, p2, one.f, wp_w.f * (index < 9 ? kPow10[index] : 0));
             return;
         }
     }
@@ -214,7 +214,7 @@ inline char* Prettify(char* buffer, int length, int k, int maxDecimalPlaces) {
 }
 
 inline char* dtoa(double value, char* buffer, int maxDecimalPlaces = 324) {
-    CEREAL_RAPIDJSON_ASSERT(maxDecimalPlaces >= 1);
+    RAPIDJSON_ASSERT(maxDecimalPlaces >= 1);
     Double d(value);
     if (d.IsZero()) {
         if (d.Sign())
@@ -236,10 +236,10 @@ inline char* dtoa(double value, char* buffer, int maxDecimalPlaces = 324) {
 }
 
 #ifdef __GNUC__
-CEREAL_RAPIDJSON_DIAG_POP
+RAPIDJSON_DIAG_POP
 #endif
 
 } // namespace internal
-CEREAL_RAPIDJSON_NAMESPACE_END
+RAPIDJSON_NAMESPACE_END
 
-#endif // CEREAL_RAPIDJSON_DTOA_
+#endif // RAPIDJSON_DTOA_
