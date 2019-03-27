@@ -40,6 +40,8 @@ namespace cereal
   { RapidJSONException( const char * what_ ) : Exception( what_ ) {} };
 }
 
+#define RAPIDJSON_HAS_CXX11_NOEXCEPT 0
+
 // Override rapidjson assertions to throw exceptions by default
 #ifndef RAPIDJSON_ASSERT
 #define RAPIDJSON_ASSERT(x) if(!(x)){ \
